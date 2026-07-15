@@ -23,6 +23,11 @@ DEMO_MODE = not os.environ.get("ANTHROPIC_API_KEY")
 
 @app.get("/", response_class=HTMLResponse)
 def home():
+    return (BASE / "landing.html").read_text(encoding="utf-8")
+
+
+@app.get("/app", response_class=HTMLResponse)
+def app_tool():
     return (BASE / "index.html").read_text(encoding="utf-8")
 
 
