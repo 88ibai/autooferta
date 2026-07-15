@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoOferta</title>
+<style>
+:root{--bg:#0c0d10;--panel:#15171d;--panel2:#1b1e26;--line:rgba(200,162,74,.18);
+--gold:#c8a24a;--gold2:#e2c473;--ink:#f3f1ea;--muted:#a6a49b;--ok:#7fb069;--warn:#e0a24a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Segoe UI',system-ui,Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1020px;margin:0 auto;padding:0 22px}
+header{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(12,13,16,.9);z-index:10}
+.nav{display:flex;align-items:center;height:64px;gap:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--gold2);box-shadow:0 0 12px var(--gold)}
+.brand{font-weight:700}.brand small{display:block;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+h1{font-size:1.6rem;margin:26px 0 6px}.sub{color:var(--muted);margin-bottom:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:16px}
+.card h2{font-size:1.02rem;margin-bottom:12px;display:flex;gap:10px;align-items:center}
+.stepnum{width:26px;height:26px;border-radius:7px;background:rgba(200,162,74,.14);color:var(--gold2);display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:.8rem;color:var(--muted);margin:8px 0 4px}
+input,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:10px 12px;font-family:inherit;font-size:.92rem}
+.btn{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#1a1400;font-weight:700;border:none;padding:14px 26px;border-radius:10px;font-size:1rem;cursor:pointer;width:100%}
+.eyebrow{color:var(--gold2);font-size:.74rem;letter-spacing:1px;text-transform:uppercase;margin:24px 0 10px}
+.crit{display:flex;gap:14px;align-items:center;margin:10px 0}.crit .nm{min-width:200px}.crit .bar{flex:1;height:12px;background:var(--panel2);border-radius:6px;overflow:hidden}.crit .fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}.crit .pts{font-weight:800;color:var(--gold2)}
+.badge{font-size:.68rem;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.warn{background:rgba(224,162,74,.08);border:1px solid rgba(224,162,74,.3);border-radius:10px;padding:12px 14px;margin:6px 0;color:#f0d9a8;font-size:.9rem}
+.sobre h3{font-size:.9rem;color:var(--gold2);margin:12px 0 6px}.chk{display:flex;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}.chk input{width:auto}
+.mem-sec{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0}.mem-sec h4{font-size:.95rem}.mem-sec .pts{color:var(--gold2);font-size:.78rem}.mem-sec p{color:var(--muted);font-size:.88rem;margin-top:6px;white-space:pre-line}.mark{color:var(--warn);font-weight:600}
+#spin{display:none;text-align:center;color:var(--muted);padding:18px}#results{display:none}
+.foot{color:var(--muted);font-size:.8rem;text-align:center;padding:28px 0 46px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.crit .nm{min-width:120px}}
+</style></head>
+<body>
+<header><div class="wrap nav"><span class="dot"></span><span class="brand">Radar de Contratos<small>AutoOferta</small></span></div></header>
+<div class="wrap">
+<h1>Prepara tu oferta en una tarde.</h1>
+<p class="sub">Rellena tu empresa, sube el pliego y recibe criterios, memoria y checklist.</p>
+<div id="inputs">
+  <div class="card"><h2><span class="stepnum">1</span> Tu empresa</h2>
+    <div class="grid2"><div><label>Nombre</label><input id="nombre"></div><div><label>CIF</label><input id="cif"></div></div>
+    <label>Actividad</label><input id="actividad">
+    <div class="grid2"><div><label>Años de experiencia</label><input id="anos"></div><div><label>Nº empleados</label><input id="empleados"></div></div>
+    <label>Certificaciones (separadas por comas)</label><input id="cert">
+    <label>Referencias / experiencia relevante</label><textarea id="ref" rows="3"></textarea>
+  </div>
+  <div class="card"><h2><span class="stepnum">2</span> Sube el pliego (PDF)</h2>
+    <input type="file" id="pliego" accept="application/pdf">
+  </div>
+  <button class="btn" onclick="run()">Preparar mi oferta ✨</button>
+  <div id="spin">Analizando el pliego y redactando la memoria…</div>
+</div>
+<div id="results"></div>
+</div>
+<div class="foot">AutoOferta es una herramienta de asistencia. La presentación y firma de cada licitación corresponde siempre a la empresa. · Evron Labs SL</div>
+<script>
+async function run(){
+  const file = document.getElementById('pliego').files[0];
+  if(!file){alert('Sube el PDF del pliego.');return;}
+  const perfil = {
+    nombre:val('nombre'), cif:val('cif'), actividad:val('actividad'),
+    anos_experiencia:val('anos'), num_empleados:val('empleados'),
+    certificaciones:val('cert').split(',').map(s=>s.trim()).filter(Boolean),
+    referencias:val('ref')
+  };
+  const fd = new FormData();
+  fd.append('pliego', file);
+  fd.append('perfil', new Blob([JSON.stringify(perfil)],{type:'application/json'}), 'perfil.json');
+  document.getElementById('spin').style.display='block';
+  try{
+    const r = await fetch('/procesar',{method:'POST',body:fd});
+    if(!r.ok) throw new Error(await r.text());
+    render(await r.json());
+  }catch(e){ document.getElementById('spin').innerText='Error: '+e.message; }
+}
+function val(id){return document.getElementById(id).value;}
+function render(res){
+  const a=res.analisis,c=res.checklist;const max=Math.max(...a.criterios_adjudicacion.map(x=>x.puntos_max));
+  let h=`<div class="eyebrow">Lo que hemos leído</div><div class="card"><b>${a.objeto}</b><div style="color:var(--muted);font-size:.9rem;margin-top:6px">${a.organo_contratacion||''} · ${a.presupuesto_base||''} · ${a.duracion||''}</div></div>`;
+  h+=`<div class="eyebrow">Criterios de adjudicación</div><div class="card">`;
+  a.criterios_adjudicacion.forEach(cr=>{h+=`<div class="crit"><div class="nm">${cr.nombre}<br><span class="badge">${cr.tipo==='formula'?'objetivo':'juicio de valor'}</span></div><div class="bar"><div class="fill" style="width:${cr.puntos_max/max*100}%"></div></div><div class="pts">${cr.puntos_max} pts</div></div>`;});
+  h+=`</div>`;
+  (a.exclusiones_criticas||[]).forEach(e=>h+=`<div class="warn">⚠ Exclusión directa: ${e}</div>`);
+  (a.faltantes||[]).forEach(f=>h+=`<div class="warn">🔎 Revisar en el pliego: ${f}</div>`);
+  h+=`<div class="eyebrow">Checklist de documentación</div><div class="card">`;
+  Object.keys(c.checklist_por_sobre).forEach(s=>{h+=`<div class="sobre"><h3>Sobre ${s}</h3>`;c.checklist_por_sobre[s].forEach(d=>h+=`<label class="chk"><input type="checkbox"> ${d.documento}</label>`);h+=`</div>`;});
+  h+=`</div><div class="eyebrow">Memoria técnica</div><div class="card"><a class="btn" style="display:inline-block;width:auto;text-decoration:none" href="${res.memoria_descarga}">⬇ Descargar memoria en Word</a><span style="color:var(--muted);font-size:.8rem;margin-left:10px">Revísala, completa los campos y firma.</span></div>`;
+  document.getElementById('inputs').style.display='none';
+  const r=document.getElementById('results');r.innerHTML=h;r.style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body></html>
