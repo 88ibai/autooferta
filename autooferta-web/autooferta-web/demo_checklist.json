@@ -1,0 +1,75 @@
+{
+  "checklist_por_sobre": {
+    "1": [
+      {
+        "documento": "Índice numerado de contenidos",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Acreditación de personalidad y representación (DNI/CIF, escritura, poder)",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Acreditación de solvencia económica y técnica",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Declaración responsable de no estar incurso en prohibición de contratar",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Dirección de correo electrónico a efectos de notificaciones",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Último recibo del Impuesto de Actividades Económicas (IAE)",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Seguro de responsabilidad civil con cobertura mínima de 300.000 € por siniestro",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Declaración jurada de no mantener deuda con Aguas de Jumilla ni con el Ayuntamiento",
+        "obligatorio": true,
+        "hecho": false
+      },
+      {
+        "documento": "Certificado de inscripción en el ROESB (Registro Oficial de Establecimientos Biocidas)",
+        "obligatorio": true,
+        "hecho": false
+      }
+    ],
+    "2": [
+      {
+        "documento": "Memoria técnica (plan de trabajo, medios, protocolo de desinfección y mejoras)",
+        "obligatorio": true,
+        "hecho": false
+      }
+    ],
+    "3": [
+      {
+        "documento": "Proposición económica conforme al Anexo II con precios unitarios (Tabla nº1 del PPT)",
+        "obligatorio": true,
+        "hecho": false
+      }
+    ]
+  },
+  "solvencia": {
+    "economica": "Volumen anual de negocios en el ámbito del contrato igual o superior al presupuesto de licitación (65.208 € anuales).",
+    "tecnica": "Relación de servicios de los últimos 5 años, con al menos un contrato por año de importe igual o superior a 20.000 €/año."
+  },
+  "avisos": [
+    "⚠ Exclusión directa: Ofertas cuyo importe sin IVA supere el presupuesto base de licitación.",
+    "⚠ Exclusión directa: Incluir en el Sobre 1 (documentación general) documentación que deba ir en los Sobres 2 o 3.",
+    "Revisar en el pliego original: Fecha y hora límite de presentación de ofertas (no consta en el texto proporcionado; comprobar en el anuncio de licitación).",
+    "Revisar en el pliego original: Detalle exacto del reparto de los 40 puntos técnicos entre subcriterios (remite al apartado 8.2 del PPT)."
+  ]
+}
