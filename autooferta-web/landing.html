@@ -57,7 +57,22 @@
   footer{padding:44px 0 60px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem}
   .foot-grid{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
   footer a{color:var(--gold2)}
-  @media(max-width:820px){.g3,.g2{grid-template-columns:1fr}.hero{padding:56px 0 40px}}
+  /* Radar animado del hero */
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:44px;align-items:center}
+  .hero-visual{display:flex;justify-content:center;margin-top:-34px}
+  .radar{position:relative;width:min(360px,78vw);aspect-ratio:1;border-radius:50%;border:1px solid var(--line);overflow:hidden;
+    background:repeating-radial-gradient(circle at 50% 50%, transparent 0 41px, rgba(200,162,74,.10) 41px 42px), radial-gradient(circle at 50% 50%, rgba(200,162,74,.06), transparent 72%);
+    box-shadow:0 0 70px rgba(200,162,74,.10) inset, 0 20px 60px rgba(0,0,0,.35)}
+  .radar .sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg, rgba(74,222,128,.48), rgba(74,222,128,.07) 55deg, transparent 90deg);animation:radar-spin 4.2s linear infinite}
+  .radar .cross::before,.radar .cross::after{content:"";position:absolute;background:var(--line)}
+  .radar .cross::before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-.5px)}
+  .radar .cross::after{top:50%;left:0;right:0;height:1px;transform:translateY(-.5px)}
+  .radar .blip{position:absolute;width:13px;height:13px;border-radius:50%;background:#5bef9a;box-shadow:0 0 16px rgba(74,222,128,.9);top:27%;left:64%;animation:radar-ping 4.2s ease-out infinite}
+  .radar .core{position:absolute;top:50%;left:50%;width:8px;height:8px;border-radius:50%;background:#5bef9a;transform:translate(-50%,-50%);box-shadow:0 0 12px rgba(74,222,128,.9)}
+  @keyframes radar-spin{to{transform:rotate(360deg)}}
+  @keyframes radar-ping{0%,100%{opacity:.25;transform:scale(.85)}9%{opacity:1;transform:scale(1.25)}18%{opacity:.25;transform:scale(.85)}}
+  @media(prefers-reduced-motion:reduce){.radar .sweep,.radar .blip{animation:none}}
+  @media(max-width:820px){.g3,.g2{grid-template-columns:1fr}.hero{padding:56px 0 40px}.hero-grid{grid-template-columns:1fr;gap:26px}.radar{width:min(260px,64vw)}}
 </style>
 </head>
 <body>
@@ -69,15 +84,20 @@
 </header>
 
 <div class="hero">
-  <div class="wrap">
-    <span class="pill">IA para licitaciones públicas</span>
-    <h1>Deja de perder licitaciones<br>por culpa del <span class="u">papeleo</span>.</h1>
-    <p class="lead">Se publican miles de contratos públicos que tu empresa podría ganar. No te presentas porque preparar la oferta son horas de memoria técnica y documentación. <strong class="gold">AutoOferta lo hace por ti:</strong> subes el pliego y te devolvemos el borrador de la memoria, el checklist de documentos y los criterios de puntuación. Tú revisas y firmas.</p>
-    <div class="cta-row">
-      <a href="/app" class="btn">Probar ahora — es gratis</a>
-      <a href="#precio" class="btn ghost">Ver precio</a>
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <span class="pill">IA para licitaciones públicas</span>
+      <h1>Deja de perder licitaciones<br>por culpa del <span class="u">papeleo</span>.</h1>
+      <p class="lead">Se publican miles de contratos públicos que tu empresa podría ganar. No te presentas porque preparar la oferta son horas de memoria técnica y documentación. <strong class="gold">AutoOferta lo hace por ti:</strong> subes el pliego y te devolvemos el borrador de la memoria, el checklist de documentos y los criterios de puntuación. Tú revisas y firmas.</p>
+      <div class="cta-row">
+        <a href="/app" class="btn">Probar ahora, es gratis</a>
+        <a href="#precio" class="btn ghost">Ver precio</a>
+      </div>
+      <p class="cta-note">Sube un pliego real y compruébalo tú mismo en un minuto.</p>
     </div>
-    <p class="cta-note">Sube un pliego real y compruébalo tú mismo en un minuto.</p>
+    <div class="hero-visual">
+      <div class="radar"><div class="sweep"></div><div class="cross"></div><span class="blip"></span><span class="core"></span></div>
+    </div>
   </div>
 </div>
 
@@ -132,7 +152,7 @@
         <li>Borrador de memoria técnica en Word</li>
         <li>Checklist de documentación por sobres</li>
         <li>Criterios de puntuación y avisos de plazo</li>
-        <li>Sin permanencia — cancelas cuando quieras</li>
+        <li>Sin permanencia, cancelas cuando quieras</li>
       </ul>
       <a href="https://buy.stripe.com/9B6aEX9pC5ZH1M30VNc7u01" class="btn">Suscribirme ahora</a>
       <p class="guarantee">Pago seguro con tarjeta vía Stripe · o <a href="/app">pruébalo gratis primero</a></p>
