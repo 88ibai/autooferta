@@ -37,6 +37,7 @@ input,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);
 <p class="sub">Rellena tu empresa, sube el pliego y recibe criterios, memoria y checklist.</p>
 <div id="inputs">
   <div class="card"><h2><span class="stepnum">1</span> Tu empresa</h2>
+    <label>Email (te enviamos aquí los resultados) *</label><input id="email" type="email" placeholder="tucorreo@empresa.com">
     <div class="grid2"><div><label>Nombre</label><input id="nombre"></div><div><label>CIF</label><input id="cif"></div></div>
     <label>Actividad</label><input id="actividad">
     <div class="grid2"><div><label>Años de experiencia</label><input id="anos"></div><div><label>Nº empleados</label><input id="empleados"></div></div>
@@ -54,9 +55,12 @@ input,textarea{width:100%;background:var(--panel2);border:1px solid var(--line);
 <div class="foot">AutoOferta es una herramienta de asistencia. La presentación y firma de cada licitación corresponde siempre a la empresa. · Evron Labs SL</div>
 <script>
 async function run(){
+  const email = val('email').trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Introduce un email válido; ahí te enviamos los resultados.');return;}
   const file = document.getElementById('pliego').files[0];
   if(!file){alert('Sube el PDF del pliego.');return;}
   const perfil = {
+    email:email,
     nombre:val('nombre'), cif:val('cif'), actividad:val('actividad'),
     anos_experiencia:val('anos'), num_empleados:val('empleados'),
     certificaciones:val('cert').split(',').map(s=>s.trim()).filter(Boolean),
@@ -69,10 +73,23 @@ async function run(){
   try{
     const r = await fetch('/procesar',{method:'POST',body:fd});
     if(!r.ok) throw new Error(await r.text());
-    render(await r.json());
+    const data = await r.json();
+    if(data.bloqueado){ paywall(data); return; }
+    render(data);
   }catch(e){ document.getElementById('spin').innerText='Error: '+e.message; }
 }
 function val(id){return document.getElementById(id).value;}
+function paywall(d){
+  document.getElementById('inputs').style.display='none';
+  const r=document.getElementById('results');
+  r.innerHTML=`<div class="eyebrow">Prueba gratis agotada</div><div class="card" style="text-align:center">
+    <h2 style="justify-content:center">Has usado tu análisis gratis 🎯</h2>
+    <p style="color:var(--muted);margin:10px 0 18px">${d.mensaje||'Suscríbete para seguir preparando ofertas sin límite.'}</p>
+    <a class="btn" style="display:inline-block;width:auto;text-decoration:none" href="${d.suscripcion}">Suscribirme — 149 €/mes + IVA</a>
+    <p style="color:var(--muted);font-size:.8rem;margin-top:12px">Sin permanencia · con ganar un solo contrato se paga solo.</p>
+  </div>`;
+  r.style.display='block';window.scrollTo({top:0,behavior:'smooth'});
+}
 function render(res){
   const a=res.analisis,c=res.checklist;const max=Math.max(...a.criterios_adjudicacion.map(x=>x.puntos_max));
   let h=`<div class="eyebrow">Lo que hemos leído</div><div class="card"><b>${a.objeto}</b><div style="color:var(--muted);font-size:.9rem;margin-top:6px">${a.organo_contratacion||''} · ${a.presupuesto_base||''} · ${a.duracion||''}</div></div>`;
