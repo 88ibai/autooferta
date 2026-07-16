@@ -31,6 +31,16 @@ def app_tool():
     return (BASE / "index.html").read_text(encoding="utf-8")
 
 
+@app.get("/aviso-legal", response_class=HTMLResponse)
+def aviso_legal():
+    return (BASE / "aviso-legal.html").read_text(encoding="utf-8")
+
+
+@app.get("/privacidad", response_class=HTMLResponse)
+def privacidad():
+    return (BASE / "privacidad.html").read_text(encoding="utf-8")
+
+
 @app.get("/salud")
 def salud():
     return {"ok": True, "modo": "demo" if DEMO_MODE else "real"}
