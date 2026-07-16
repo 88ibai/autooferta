@@ -9,26 +9,39 @@ Sin ANTHROPIC_API_KEY arranca en MODO DEMO: /procesar devuelve la salida de ejem
 
 Muro Fase 0: se pide email para usar la herramienta. 1 análisis gratis por email;
 al agotarlo se invita a suscribirse. Cada uso queda registrado como lead.
+
+Persistencia: usos.json y leads.jsonl se guardan en DATA_DIR (disco persistente de
+Render si está montado; si no, junto al código). Los leads se descargan en /leads?key=...
 """
 import os
+import io
+import csv
 import json
 import uuid
 import datetime
 from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Response
 
-app = FastAPI(title="AutoOferta", version="1.1")
+app = FastAPI(title="AutoOferta", version="1.2")
 BASE = Path(__file__).parent
 TRABAJO = BASE / "trabajos"; TRABAJO.mkdir(exist_ok=True)
 DEMO_MODE = not os.environ.get("ANTHROPIC_API_KEY")
 
-# --- Muro de prueba gratis -------------------------------------------------
+# --- Almacén persistente (disco de Render si DATA_DIR apunta a él) ----------
+DATA_DIR = Path(os.environ.get("DATA_DIR", str(BASE)))
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    DATA_DIR = BASE
+
+# --- Muro de prueba gratis + captura de leads ------------------------------
 FREE_LIMIT = int(os.environ.get("FREE_LIMIT", "1"))
 STRIPE_URL = os.environ.get("STRIPE_URL", "https://buy.stripe.com/9B6aEX9pC5ZH1M30VNc7u01")
-USOS_FILE = BASE / "usos.json"
-LEADS_FILE = BASE / "leads.jsonl"
+LEADS_KEY = os.environ.get("LEADS_KEY", "")
+USOS_FILE = DATA_DIR / "usos.json"
+LEADS_FILE = DATA_DIR / "leads.jsonl"
 
 
 def _cargar_usos():
@@ -83,6 +96,30 @@ def privacidad():
 @app.get("/salud")
 def salud():
     return {"ok": True, "modo": "demo" if DEMO_MODE else "real"}
+
+
+@app.get("/leads")
+def leads(key: str = ""):
+    """Descarga privada de los leads capturados en CSV. Requiere ?key=LEADS_KEY."""
+    if not LEADS_KEY or key != LEADS_KEY:
+        raise HTTPException(403, "No autorizado.")
+    filas = []
+    if LEADS_FILE.exists():
+        for line in LEADS_FILE.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line:
+                try:
+                    filas.append(json.loads(line))
+                except Exception:
+                    pass
+    buf = io.StringIO()
+    w = csv.writer(buf)
+    w.writerow(["fecha", "email", "empresa", "cif", "actividad"])
+    for f in filas:
+        w.writerow([f.get("ts", ""), f.get("email", ""), f.get("empresa", ""),
+                    f.get("cif", ""), f.get("actividad", "")])
+    return Response(content=buf.getvalue(), media_type="text/csv",
+                    headers={"Content-Disposition": "attachment; filename=leads.csv"})
 
 
 @app.post("/procesar")
